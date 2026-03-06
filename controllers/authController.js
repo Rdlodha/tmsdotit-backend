@@ -232,7 +232,7 @@ async function register(req, res) {
           <p style="margin-top:16px;font-size:12px;color:#666;">This link expires in 24 hours.</p>
         </div>
       `
-        }).catch((err) => console.dir("Failed to send verification email:", err.message), console.dir(verifyUrl, normalizedEmail));
+        }).catch((err) => console.error("Failed to send verification email:", err.message), console.dir(verifyUrl, normalizedEmail));
 
         return res.status(201).json({
             message: "Registration successful! Please check your email to verify your account before logging in.",
