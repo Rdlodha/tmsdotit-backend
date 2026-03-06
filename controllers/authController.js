@@ -216,7 +216,7 @@ async function register(req, res) {
 
         const verifyUrl = `${process.env.BACKEND_URL}/auth/verify-email?token=${verificationToken}`;
 
-        await sendEmail({
+        const emailResult = await sendEmail({
             to: normalizedEmail,
             subject: "DOT IT – Verify your email address",
             html: `
@@ -231,6 +231,8 @@ async function register(req, res) {
                 </div>
             `
         });
+        console.log(emailResult);
+        console.log("Email Result:", JSON.stringify(emailResult, null, 2));
 
         return res.status(201).json({
             message: "Registration successful! Please check your email to verify your account before logging in.",
