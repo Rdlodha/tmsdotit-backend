@@ -215,24 +215,22 @@ async function register(req, res) {
         });
 
         const verifyUrl = `${process.env.BACKEND_URL}/auth/verify-email?token=${verificationToken}`;
-        // https://your-backend.onrender.com/auth/verify-email
-        // https://tmsdotit-backend.onrender.com/auth/verify-email
-        sendEmail({
+
+        await sendEmail({
             to: normalizedEmail,
             subject: "DOT IT – Verify your email address",
-            text:"f",
-            html:`
-        <div style="font-family: Arial, sans-serif; max-width: 480px; margin: auto;">
-          <h2>Welcome to DOT IT, ${String(name).trim()}!</h2>
-          <p>Please verify your email address by clicking the button below:</p>
-          <a href="${verifyUrl}"
-             style="display:inline-block;padding:12px 24px;background:#4f46e5;color:#fff;text-decoration:none;border-radius:6px;">
-            Verify Email
-          </a>
-          <p style="margin-top:16px;font-size:12px;color:#666;">This link expires in 24 hours.</p>
-        </div>
-      `
-        }).catch((err) => console.error("Failed to send verification email:", err.message), console.dir(verifyUrl, normalizedEmail));
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 480px; margin: auto;">
+                  <h2>Welcome to DOT IT, ${String(name).trim()}!</h2>
+                  <p>Please verify your email address by clicking the button below:</p>
+                  <a href="${verifyUrl}"
+                     style="display:inline-block;padding:12px 24px;background:#4f46e5;color:#fff;text-decoration:none;border-radius:6px;">
+                    Verify Email
+                  </a>
+                  <p style="margin-top:16px;font-size:12px;color:#666;">This link expires in 24 hours.</p>
+                </div>
+            `
+        });
 
         return res.status(201).json({
             message: "Registration successful! Please check your email to verify your account before logging in.",
