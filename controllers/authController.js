@@ -2,6 +2,7 @@ const crypto = require("crypto");
 const { User } = require("../models");
 const sendEmail = require("../utils/sendEmail");
 
+
 // ─── Config ────────────────────────────────────────────────────────────────────
 const PORT = Number(process.env.PORT || 5000);
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || "http://localhost:5173";
@@ -213,13 +214,14 @@ async function register(req, res) {
 
         });
 
-        const verifyUrl = `${process.env.CLIENT_ORIGIN}/auth/verify-email?token=${verificationToken}`;
+        const verifyUrl = `${process.env.BACKEND_ORIGIN}/auth/verify-email?token=${verificationToken}`;
         // https://your-backend.onrender.com/auth/verify-email
         // https://tmsdotit-backend.onrender.com/auth/verify-email
-        await sendEmail({
+        sendEmail({
             to: normalizedEmail,
             subject: "DOT IT – Verify your email address",
-            html: `
+            text:"f",
+            html:`
         <div style="font-family: Arial, sans-serif; max-width: 480px; margin: auto;">
           <h2>Welcome to DOT IT, ${String(name).trim()}!</h2>
           <p>Please verify your email address by clicking the button below:</p>
@@ -230,7 +232,7 @@ async function register(req, res) {
           <p style="margin-top:16px;font-size:12px;color:#666;">This link expires in 24 hours.</p>
         </div>
       `
-        }).catch((err) => console.error("Failed to send verification email:", err.message, verifyUrl, normalizedEmail));
+        }).catch((err) => console.dir("Failed to send verification email:", err), console.dir(verifyUrl, normalizedEmail));
 
         return res.status(201).json({
             message: "Registration successful! Please check your email to verify your account before logging in.",
