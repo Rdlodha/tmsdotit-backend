@@ -216,27 +216,38 @@ async function register(req, res) {
 
         const verifyUrl = `${process.env.BACKEND_URL}/auth/verify-email?token=${verificationToken}`;
 
-        const emailResult = await sendEmail({
-            to: normalizedEmail,
-            subject: "DOT IT – Verify your email address",
-            html: `
-                <div style="font-family: Arial, sans-serif; max-width: 480px; margin: auto;">
-                  <h2>Welcome to DOT IT, ${String(name).trim()}!</h2>
-                  <p>Please verify your email address by clicking the button below:</p>
-                  <a href="${verifyUrl}"
-                     style="display:inline-block;padding:12px 24px;background:#4f46e5;color:#fff;text-decoration:none;border-radius:6px;">
-                    Verify Email
-                  </a>
-                  <p style="margin-top:16px;font-size:12px;color:#666;">This link expires in 24 hours.</p>
-                </div>
-            `
-        });
-        console.log(emailResult);
-        console.log("Email Result:", JSON.stringify(emailResult, null, 2));
+        try {
+            const emailResult = await sendEmail({
+                to: normalizedEmail,
+                subject: "DOT IT – Verify your email address",
+                html: `
+                    <div style="font-family: Arial, sans-serif; max-width: 480px; margin: auto;">
+                      <h2>Welcome to DOT IT, ${String(name).trim()}!</h2>
+                      <p>Please verify your email address by clicking the button below:</p>
+                      <a href="${verifyUrl}"
+                         style="display:inline-block;padding:12px 24px;background:#4f46e5;color:#fff;text-decoration:none;border-radius:6px;">
+                        Verify Email
+                      </a>
+                      <p style="margin-top:16px;font-size:12px;color:#666;">This link expires in 24 hours.</p>
+                    </div>`
+            });
 
-        return res.status(201).json({
-            message: "Registration successful! Please check your email to verify your account before logging in.",
-        });
+            console.log("Email sent successfully:", JSON.stringify(emailResult, null, 2));
+
+            return res.status(201).json({
+                message: "Registration successful! Please check your email to verify your account before logging in.",
+            });
+        } catch (emailError) {
+            console.error("Failed to send verification email:", emailError.message);
+            
+            // Delete the user since email verification is critical
+            await User.deleteOne({ _id: user._id });
+            
+            return res.status(500).json({ 
+                message: "Failed to send verification email. Please try registering again.",
+                error: emailError.message 
+            });
+        }
     } catch (error) {
         console.error("Registration error:", error.message);
         return res.status(500).json({ message: "Registration failed", error: error.message });
