@@ -214,7 +214,7 @@ async function register(req, res) {
 
         });
 
-        const verifyUrl = `${process.env.BACKEND_ORIGIN}/auth/verify-email?token=${verificationToken}`;
+        const verifyUrl = `${process.env.BACKEND_URL}/auth/verify-email?token=${verificationToken}`;
         // https://your-backend.onrender.com/auth/verify-email
         // https://tmsdotit-backend.onrender.com/auth/verify-email
         sendEmail({
