@@ -129,21 +129,23 @@ function createRefreshToken(user) {
 }
 
 function setRefreshCookie(res, refreshToken) {
+    const isProduction = NODE_ENV === "production";
     res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
-        secure: NODE_ENV === "production",
-        sameSite: "lax",
+        secure: true,
+        sameSite: 'none',
         maxAge: REFRESH_TOKEN_TTL_SECONDS * 1000,
-        path: "/auth",
+        path: "/",
     });
 }
 
 function clearRefreshCookie(res) {
+    const isProduction = NODE_ENV === "production";
     res.clearCookie("refreshToken", {
         httpOnly: true,
-        secure: NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/auth",
+        secure: true,
+        sameSite: 'none',
+        path: "/",
     });
 }
 
