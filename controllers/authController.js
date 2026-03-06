@@ -210,12 +210,13 @@ async function register(req, res) {
             verificationToken,
             verificationTokenExpires,
             role: role === "admin" ? "admin" : "user",
+
         });
 
-        const verifyUrl = `http://tmsdotit-backend.onrender.com/auth/verify-email?token=${verificationToken}`;
+        const verifyUrl = `${process.env.CLIENT_ORIGIN}/auth/verify-email?token=${verificationToken}`;
         // https://your-backend.onrender.com/auth/verify-email
         // https://tmsdotit-backend.onrender.com/auth/verify-email
-        sendEmail({
+        await sendEmail({
             to: normalizedEmail,
             subject: "DOT IT – Verify your email address",
             html: `
@@ -228,8 +229,8 @@ async function register(req, res) {
           </a>
           <p style="margin-top:16px;font-size:12px;color:#666;">This link expires in 24 hours.</p>
         </div>
-      `,
-        }).catch((err) => console.error("Failed to send verification email:", err.message));
+      `
+        }).catch((err) => console.error("Failed to send verification email:", err.message, verifyUrl, normalizedEmail));
 
         return res.status(201).json({
             message: "Registration successful! Please check your email to verify your account before logging in.",
