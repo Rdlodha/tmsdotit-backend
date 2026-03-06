@@ -212,7 +212,7 @@ async function register(req, res) {
             role: role === "admin" ? "admin" : "user",
         });
 
-        const verifyUrl = `https://tmsdotit-backend.onrender.com/auth/verify-email?token=${verificationToken}`;
+        const verifyUrl = `http://tmsdotit-backend.onrender.com/auth/verify-email?token=${verificationToken}`;
         // https://your-backend.onrender.com/auth/verify-email
         // https://tmsdotit-backend.onrender.com/auth/verify-email
         sendEmail({
