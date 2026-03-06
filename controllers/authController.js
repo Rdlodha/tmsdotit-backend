@@ -238,7 +238,7 @@ async function register(req, res) {
                 message: "Registration successful! Please check your email to verify your account before logging in.",
             });
         } catch (emailError) {
-            console.error("Failed to send verification email:", emailError.message);
+            console.error("Failed to send verification email:", emailError.message,JSON.stringify(emailResult, null, 2));
             
             // Delete the user since email verification is critical
             await User.deleteOne({ _id: user._id });
