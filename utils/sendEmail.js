@@ -6,7 +6,7 @@ const nodemailer = require("nodemailer");
  */
 async function sendEmail({ to, subject, text, html }) {
     const transporter = nodemailer.createTransport({
-        host: "smtp.gmail.com",
+        host: "gmail",
         port: 465,
         secure: false, // use SSL
         auth: {
