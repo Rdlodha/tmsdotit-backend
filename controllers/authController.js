@@ -215,6 +215,7 @@ async function register(req, res) {
         });
 
         const verifyUrl = `${process.env.BACKEND_URL}/auth/verify-email?token=${verificationToken}`;
+        console.log("verifyUrl: ", verifyUrl);
 
         try {
             const emailResult = await sendEmail({
