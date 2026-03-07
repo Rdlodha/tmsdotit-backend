@@ -239,14 +239,14 @@ async function register(req, res) {
                 message: "Registration successful! Please check your email to verify your account before logging in.",
             });
         } catch (emailError) {
-            console.error("Failed to send verification email:", emailError.message,JSON.stringify(emailResult, null, 2));
-            
+            console.error("Failed to send verification email:", emailError.message);
+
             // Delete the user since email verification is critical
             await User.deleteOne({ _id: user._id });
-            
-            return res.status(500).json({ 
+
+            return res.status(500).json({
                 message: "Failed to send verification email. Please try registering again.",
-                error: emailError.message 
+                error: emailError.message
             });
         }
     } catch (error) {
