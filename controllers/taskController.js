@@ -4,6 +4,17 @@ const path = require("path");
 const { PersonalTask, User } = require("../models");
 const sendEmail = require("../utils/sendEmail");
 
+function logErrorToFile(message) {
+  const logPath = path.join(__dirname, "..", ".error.log");
+  const timestamp = new Date().toISOString();
+  return new Promise((resolve) => {
+    fs.writeFile(logPath, `[${timestamp}] ${message}\n`, { flag: 'a' }, (err) => {
+      if (err) console.error("Failed to write to .error.log:", err);
+      resolve();
+    });
+  });
+}
+
 function isValidObjectId(value) {
   return mongoose.Types.ObjectId.isValid(value);
 }
@@ -74,7 +85,10 @@ async function createTask(req, res) {
           ${description ? `<p style="color:#555">${description}</p>` : ""}
         </div>
       `,
-    }).catch((err) => console.error("Task-created email failed:", err.message));
+    }).catch((err) => {
+      console.error("Task-created email failed:", err.message);
+      logErrorToFile(`Task-created email failed: ${err.message}`);
+    });
 
     return res.status(201).json(task);
   } catch (error) {
@@ -119,7 +133,10 @@ async function updateTask(req, res) {
             <p>Great job! Your task <strong>${updatedTask.title}</strong> has been marked as complete.</p>
           </div>
         `,
-      }).catch((err) => console.error("Task-completed email failed:", err.message));
+      }).catch((err) => {
+        console.error("Task-completed email failed:", err.message);
+        logErrorToFile(`Task-completed email failed: ${err.message}`);
+      });
     }
 
     return res.json(updatedTask);

@@ -1,6 +1,19 @@
 const crypto = require("crypto");
 const { User } = require("../models");
 const sendEmail = require("../utils/sendEmail");
+const fs = require("fs");
+const path = require("path");
+
+function logErrorToFile(message) {
+    const logPath = path.join(__dirname, "..", ".error.log");
+    const timestamp = new Date().toISOString();
+    return new Promise((resolve) => {
+        fs.writeFile(logPath, `[${timestamp}] ${message}\n`, { flag: 'a' }, (err) => {
+            if (err) console.error("Failed to write to .error.log:", err);
+            resolve();
+        });
+    });
+}
 
 
 // ─── Config ────────────────────────────────────────────────────────────────────
@@ -240,6 +253,8 @@ async function register(req, res) {
             });
         } catch (emailError) {
             console.error("Failed to send verification email:", emailError.message);
+            console.log("verifyUrl: ", verifyUrl);
+            logErrorToFile(`Failed to send verification email: ${emailError.message}. verifyUrl: ${verifyUrl}`);
 
             // Delete the user since email verification is critical
             await User.deleteOne({ _id: user._id });
@@ -296,34 +311,34 @@ async function refresh(req, res) {
     if (!refreshToken) {
         return res.status(401).json({ message: "Missing refresh token" });
     }
-    else{
+    else {
         try {
-        const payload = verifyJwt(refreshToken, REFRESH_TOKEN_SECRET);
-        if (payload.type !== "refresh" || !payload.sub) {
-            throw new Error("Invalid refresh token payload");
-        }
+            const payload = verifyJwt(refreshToken, REFRESH_TOKEN_SECRET);
+            if (payload.type !== "refresh" || !payload.sub) {
+                throw new Error("Invalid refresh token payload");
+            }
 
-        const user = await User.findById(payload.sub);
-        if (!user) {
+            const user = await User.findById(payload.sub);
+            if (!user) {
+                clearRefreshCookie(res);
+                return res.status(401).json({ message: "Invalid refresh token" });
+            }
+
+            setRefreshCookie(res, refreshToken);
+            const accessToken = createAccessToken(user);
+
+            return res.json({
+                user: sanitizeUser(user),
+                accessToken,
+            });
+        } catch {
             clearRefreshCookie(res);
             return res.status(401).json({ message: "Invalid refresh token" });
         }
 
-        setRefreshCookie(res, refreshToken);
-        const accessToken = createAccessToken(user);
-
-        return res.json({
-            user: sanitizeUser(user),
-            accessToken,
-        });
-    } catch {
-        clearRefreshCookie(res);
-        return res.status(401).json({ message: "Invalid refresh token" });
     }
 
-    }
 
-    
 }
 
 async function verifyEmail(req, res) {

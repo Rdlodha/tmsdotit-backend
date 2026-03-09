@@ -2,6 +2,19 @@ const mongoose = require("mongoose");
 const AdminTask = require("../models/AdminTask");
 const { User } = require("../models");
 const sendEmail = require("../utils/sendEmail");
+const fs = require("fs");
+const path = require("path");
+
+function logErrorToFile(message) {
+    const logPath = path.join(__dirname, "..", ".error.log");
+    const timestamp = new Date().toISOString();
+    return new Promise((resolve) => {
+        fs.appendFile(logPath, `[${timestamp}] ${message}\n`, (err) => {
+            if (err) console.error("Failed to write to .error.log:", err);
+            resolve();
+        });
+    });
+}
 
 function isValidObjectId(value) {
     return mongoose.Types.ObjectId.isValid(value);
@@ -48,7 +61,10 @@ async function createAdminTask(req, res) {
           ${deadline ? `<p>Deadline: <strong>${new Date(deadline).toLocaleDateString()}</strong></p>` : ""}
         </div>
       `,
-        }).catch((err) => console.error("Admin-task email failed:", err.message));
+        }).catch((err) => {
+            console.error("Admin-task email failed:", err.message);
+            logErrorToFile(`Admin-task email failed: ${err.message}`);
+        });
 
         return res.status(201).json(task);
     } catch (error) {
@@ -184,7 +200,10 @@ async function updateMyAssignedTaskStatus(req, res) {
               <p>${req.user.name} has completed the task: <strong>${updatedTask.title}</strong></p>
             </div>
           `,
-                }).catch((err) => console.error("Task-completed email failed:", err.message));
+                }).catch((err) => {
+                    console.error("Task-completed email failed:", err.message);
+                    logErrorToFile(`Task-completed email (AdminTask) failed: ${err.message}`);
+                });
             }
         }
 
