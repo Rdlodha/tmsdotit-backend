@@ -296,8 +296,8 @@ async function refresh(req, res) {
     if (!refreshToken) {
         return res.status(401).json({ message: "Missing refresh token" });
     }
-
-    try {
+    else{
+        try {
         const payload = verifyJwt(refreshToken, REFRESH_TOKEN_SECRET);
         if (payload.type !== "refresh" || !payload.sub) {
             throw new Error("Invalid refresh token payload");
@@ -320,6 +320,10 @@ async function refresh(req, res) {
         clearRefreshCookie(res);
         return res.status(401).json({ message: "Invalid refresh token" });
     }
+
+    }
+
+    
 }
 
 async function verifyEmail(req, res) {
