@@ -2,7 +2,7 @@
 
 async function sendEmail({ to, subject, text, html }) {
     const resendApiKey = process.env.RESEND_API_KEY;
-    const fromEmail = process.env.EMAIL_FROM || "noreply@example.com";
+    const fromEmail = process.env.EMAIL_FROM || "onboarding@resend.dev" || "noreply@example.com";
 
     if (!resendApiKey) {
         throw new Error("RESEND_API_KEY is not set in environment variables");
